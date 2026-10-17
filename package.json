@@ -1,0 +1,33 @@
+{
+  "name": "router-console",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Panel pribadi untuk AI Router kamu: chat, cek model, bikin foto & video, export ZIP. Tema cream/charcoal.",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0 -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.1.2",
+    "@fontsource-variable/plus-jakarta-sans": "^5.1.1",
+    "highlight.js": "^11.11.1",
+    "jszip": "^3.10.1",
+    "next": "^15.5.28",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-markdown": "^9.0.3",
+    "rehype-highlight": "^7.0.1",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.4",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #edebe4;
+  --bg2: #e6e3da;
+  --panel: #f4f2eb;
+  --chip: #fbfaf6;
+  --ink: #262220;
+  --muted: #8a857c;
+  --line: rgba(38, 34, 32, 0.13);
+}
+
+.dark {
+  --bg: #262220;
+  --bg2: #211d1b;
+  --panel: #2e2a27;
+  --chip: #363230;
+  --ink: #edebe4;
+  --muted: #9b968d;
+  --line: rgba(237, 235, 228, 0.15);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "ss01", "cv05";
+}
+
+::selection {
+  background: #262220;
+  color: #edebe4;
+}
+.dark ::selection {
+  background: #edebe4;
+  color: #262220;
+}
+
+/* scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 99px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* input number bersih */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ====== Markdown ====== */
+.md > * + * {
+  margin-top: 0.85em;
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-top: 1.4em;
+}
+.md h1 { font-size: 1.6em; }
+.md h2 { font-size: 1.35em; }
+.md h3 { font-size: 1.15em; }
+.md ul { list-style: disc; padding-left: 1.2em; }
+.md ol { list-style: decimal; padding-left: 1.2em; }
+.md li + li { margin-top: 0.3em; }
+.md a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+.md blockquote {
+  border-left: 3px solid var(--muted);
+  padding-left: 1em;
+  color: var(--muted);
+  font-style: italic;
+}
+.md table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+.md th,
+.md td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+}
+.md th {
+  font-weight: 700;
+}
+.md hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.md p code,
+.md li code,
+.md td code {
+  font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+  font-size: 0.86em;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+
+/* ====== Code block (selalu charcoal, biar kontras di tema terang & gelap) ====== */
+.codeblock {
+  background: #211d1b;
+  color: #edebe4;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(237, 235, 228, 0.12);
+}
+.codeblock pre {
+  margin: 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.codeblock code {
+  font-family: inherit;
+}
+.hljs-comment,
+.hljs-quote { color: #7d786f; font-style: italic; }
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-type,
+.hljs-doctag { color: #e8a888; }
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-template-tag { color: #b5c99a; }
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet { color: #dcc589; }
+.hljs-title,
+.hljs-section,
+.hljs-function { color: #e6d3a3; }
+.hljs-attribute,
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-property { color: #cbb8a8; }
+.hljs-built_in,
+.hljs-class .hljs-title,
+.hljs-title.class_ { color: #d9b8a0; }
+.hljs-deletion { color: #d98c8c; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
