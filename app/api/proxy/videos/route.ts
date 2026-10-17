@@ -1,4 +1,4 @@
-import { isMock, requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { readConfig } from "@/lib/server";
 import { mockVideoCreate } from "@/lib/mock";
 
@@ -11,10 +11,9 @@ export async function POST(req: Request) {
   if (denied) return denied;
 
   const body = await req.json().catch(() => ({}));
-
-  if (isMock()) return Response.json(mockVideoCreate());
-
   const cfg = readConfig(req);
+
+  if (!cfg.key) return Response.json(mockVideoCreate());
   const payload = {
     model: body.model,
     prompt: body.prompt,
@@ -47,12 +46,11 @@ export async function GET(req: Request) {
   const id = new URL(req.url).searchParams.get("id") || "";
   if (!id) return Response.json({ error: "Param id wajib." }, { status: 400 });
 
-  if (isMock()) {
+  const cfg = readConfig(req);
+  if (!cfg.key) {
     const { mockVideoStatus } = await import("@/lib/mock");
     return Response.json(mockVideoStatus(id));
   }
-
-  const cfg = readConfig(req);
   const path = cfg.videoStatusPath.replace("{id}", encodeURIComponent(id));
   try {
     const up = await fetch(cfg.baseUrl.replace(/\/+$/, "") + path, {

@@ -1,4 +1,4 @@
-import { isMock, requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { readConfig } from "@/lib/server";
 import { mockImages } from "@/lib/mock";
 
@@ -10,13 +10,13 @@ export async function POST(req: Request) {
   if (denied) return denied;
 
   const body = await req.json().catch(() => ({}));
+  const cfg = readConfig(req);
 
-  if (isMock()) {
+  if (!cfg.key) {
     await new Promise((r) => setTimeout(r, 900));
     return Response.json(mockImages(body.prompt || "", body.n || 1));
   }
 
-  const cfg = readConfig(req);
   const payload = {
     model: body.model,
     prompt: body.prompt,

@@ -1,4 +1,4 @@
-import { isMock, requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { readConfig } from "@/lib/server";
 import { mockChatJson, mockStream } from "@/lib/mock";
 
@@ -10,8 +10,9 @@ export async function POST(req: Request) {
   if (denied) return denied;
 
   const body = await req.json().catch(() => ({}));
+  const cfg = readConfig(req);
 
-  if (isMock()) {
+  if (!cfg.key) {
     if (body.stream) {
       const enc = new TextEncoder();
       const stream = new ReadableStream({
@@ -27,7 +28,6 @@ export async function POST(req: Request) {
     return Response.json(mockChatJson());
   }
 
-  const cfg = readConfig(req);
   const payload = {
     model: body.model,
     messages: body.messages,

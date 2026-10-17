@@ -1,4 +1,4 @@
-import { isMock, requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { readConfig } from "@/lib/server";
 import { mockModels } from "@/lib/mock";
 
@@ -8,9 +8,9 @@ export async function GET(req: Request) {
   const denied = requireAuth(req);
   if (denied) return denied;
 
-  if (isMock()) return Response.json(mockModels());
-
   const cfg = readConfig(req);
+  if (!cfg.key) return Response.json(mockModels());
+
   const started = Date.now();
   try {
     const up = await fetch(cfg.baseUrl.replace(/\/+$/, "") + cfg.modelsPath, {

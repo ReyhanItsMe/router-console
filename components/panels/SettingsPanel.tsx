@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { BigTitle, Btn, Card, Eyebrow, Field, Icon, Input, Seg, Textarea } from "../ui";
-import { getConfig, getTheme, saveConfig, setTheme, toast } from "@/lib/client";
+import React, { useEffect, useState } from "react";
+import { BigTitle, Btn, Card, Eyebrow, Field, Icon, Input, Seg, Spinner, Textarea } from "../ui";
+import { api, getConfig, getTheme, saveConfig, setTheme, toast } from "@/lib/client";
 import { DEFAULT_CONFIG, RouterConfig } from "@/lib/config";
 import { exportAllZip } from "@/lib/zip";
 
@@ -10,6 +10,18 @@ export default function SettingsPanel({ username }: { username: string }) {
   const [cfg, setCfg] = useState<RouterConfig>(() => getConfig());
   const [headersJson, setHeadersJson] = useState(() => JSON.stringify(getConfig().extraHeaders || {}, null, 2));
   const [theme, setThemeState] = useState<"light" | "dark">(getTheme());
+  const [showKey, setShowKey] = useState(false);
+  const [envKey, setEnvKey] = useState<boolean | null>(null);
+  const [testing, setTesting] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/status")
+      .then((r) => r.json())
+      .then((j) => setEnvKey(!!j.hasEnvKey))
+      .catch(() => setEnvKey(false));
+  }, []);
+
+  const keySource = cfg.apiKey ? "browser" : envKey ? "env" : "none";
 
   const save = () => {
     let extra: Record<string, string> = {};
@@ -23,6 +35,29 @@ export default function SettingsPanel({ username }: { username: string }) {
     saveConfig(next);
     setCfg(next);
     toast("Setting tersimpan", "ok");
+  };
+
+  const clearKey = () => {
+    const next = { ...cfg, apiKey: "" };
+    saveConfig(next);
+    setCfg(next);
+    toast("Key di browser dihapus", "ok");
+  };
+
+  const testConnection = async () => {
+    setTesting(true);
+    try {
+      const started = Date.now();
+      const res = await api("/api/proxy/models");
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || `HTTP ${res.status}`);
+      const n = (j.data || j.models || []).length;
+      toast(`Tersambung! ${n} model ditemukan (${Date.now() - started} ms)`, "ok");
+    } catch (e: any) {
+      toast(e?.message || "Gagal tersambung", "err");
+    } finally {
+      setTesting(false);
+    }
   };
 
   const reset = () => {
@@ -62,9 +97,34 @@ export default function SettingsPanel({ username }: { username: string }) {
         <Card className="p-5 sm:p-6">
           <h2 className="font-extrabold tracking-tight text-lg">Koneksi router</h2>
           <p className="mt-1 text-sm text-muted">
-            Default dibaca dari env server. Override di sini tersimpan lokal di browser kamu saja — API key tetap di server.
+            Default dibaca dari env server. Override di sini tersimpan lokal di browser kamu saja — key dikirim ke server
+            app kamu sendiri lewat HTTPS, tidak pernah ke pihak lain.
           </p>
           <div className="mt-5 space-y-4">
+            <Field
+              label="API key router (opsional)"
+              hint={
+                keySource === "browser"
+                  ? "Aktif: key dari browser ini (override env)."
+                  : keySource === "env"
+                  ? "Aktif: key dari env server (AI_ROUTER_API_KEY)."
+                  : "Belum ada key — app jalan di mode demo. Tempel key di sini biar pakai AI beneran."
+              }
+            >
+              <div className="flex gap-2">
+                <Input
+                  type={showKey ? "text" : "password"}
+                  value={cfg.apiKey || ""}
+                  onChange={(e) => setCfg({ ...cfg, apiKey: e.target.value })}
+                  placeholder="bwr_live_…"
+                  className="font-mono text-xs"
+                  autoComplete="off"
+                />
+                <Btn variant="outline" onClick={() => setShowKey(!showKey)} className="shrink-0 px-4">
+                  {showKey ? "tutup" : "lihat"}
+                </Btn>
+              </div>
+            </Field>
             <Field label="Base URL">
               <Input value={cfg.baseUrl} onChange={(e) => setCfg({ ...cfg, baseUrl: e.target.value })} className="font-mono text-xs" />
             </Field>
@@ -96,9 +156,17 @@ export default function SettingsPanel({ username }: { username: string }) {
                 { value: "off", label: "Tanpa streaming" },
               ]}
             />
-            <div className="flex gap-2 pt-1">
+            <div className="flex flex-wrap gap-2 pt-1">
               <Btn onClick={save}>Simpan setting</Btn>
+              <Btn variant="light" onClick={testConnection} disabled={testing}>
+                {testing ? <Spinner /> : Icon.spark} Tes koneksi
+              </Btn>
               <Btn variant="outline" onClick={reset}>Reset default</Btn>
+              {cfg.apiKey ? (
+                <Btn variant="ghost" onClick={clearKey}>
+                  {Icon.trash} Hapus key browser
+                </Btn>
+              ) : null}
             </div>
           </div>
         </Card>

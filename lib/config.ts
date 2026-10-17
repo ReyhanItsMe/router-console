@@ -8,6 +8,8 @@ export type RouterConfig = {
   videoStatusPath: string; // pakai {id} sebagai placeholder
   extraHeaders: Record<string, string>;
   stream: boolean;
+  // Opsional: key yang disimpan di browser ini saja (override env server).
+  apiKey?: string;
 };
 
 export type Status = { ok: boolean; username: string; mock: boolean };

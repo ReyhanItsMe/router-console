@@ -25,16 +25,19 @@ export function readConfig(req: Request) {
     ...clean(override),
   };
 
+  // Key dari browser (panel Setting) menang atas env server.
+  const key = cfg.apiKey || process.env.AI_ROUTER_API_KEY || "";
+
   const headers: Record<string, string> = {
     Accept: "application/json",
     ...extraHeaders,
     ...(cfg.extraHeaders || {}),
   };
-  if (process.env.AI_ROUTER_API_KEY) {
-    headers.Authorization = `Bearer ${process.env.AI_ROUTER_API_KEY}`;
+  if (key) {
+    headers.Authorization = `Bearer ${key}`;
   }
 
-  return { ...cfg, headers, url: (p: string) => joinUrl(cfg.baseUrl, p) };
+  return { ...cfg, key, headers, url: (p: string) => joinUrl(cfg.baseUrl, p) };
 }
 
 function clean(o: Partial<RouterConfig>): Partial<RouterConfig> {

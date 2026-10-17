@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Icon, Logo, Seg } from "./ui";
-import { applyTheme, getTheme, registerToast, setTheme } from "@/lib/client";
+import { applyTheme, getConfig, getTheme, registerToast, setTheme } from "@/lib/client";
 import ChatPanel from "./panels/ChatPanel";
 import ModelsPanel from "./panels/ModelsPanel";
 import ImagesPanel from "./panels/ImagesPanel";
@@ -24,15 +24,20 @@ export default function Shell({ username, mock, onLogout }: { username: string; 
   const [menu, setMenu] = useState(false);
   const [theme, setThemeState] = useState<"light" | "dark">("light");
   const [toasts, setToasts] = useState<{ id: number; msg: string; kind: string }[]>([]);
+  const [localKey, setLocalKey] = useState("");
 
   useEffect(() => {
     applyTheme();
     setThemeState(getTheme());
+    setLocalKey(getConfig().apiKey || "");
+    const onCfg = (e: any) => setLocalKey(e.detail?.apiKey || "");
+    window.addEventListener("rc-config", onCfg);
     registerToast((msg, kind = "ok") => {
       const id = Date.now() + Math.random();
       setToasts((t) => [...t, { id, msg, kind }]);
       setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 2600);
     });
+    return () => window.removeEventListener("rc-config", onCfg);
   }, []);
 
   const switchTheme = (t: "light" | "dark") => {
@@ -127,10 +132,18 @@ export default function Shell({ username, mock, onLogout }: { username: string; 
 
       {/* ===== Konten ===== */}
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
-        {mock ? (
-          <div className="mb-8 rounded-2xl border border-line bg-panel px-5 py-4 text-sm text-muted animate-fadeUp">
-            <b className="text-ink">Mode demo aktif.</b> AI_ROUTER_API_KEY belum di-set, jadi semua panel memakai data
-            contoh. Isi env di Vercel untuk menembak router asli.
+        {mock && !localKey ? (
+          <div className="mb-8 rounded-2xl border border-line bg-panel px-5 py-4 text-sm text-muted animate-fadeUp flex flex-wrap items-center justify-between gap-3">
+            <span>
+              <b className="text-ink">Mode demo aktif.</b> Belum ada API key — tempel key router kamu sekali di Setting
+              (disimpan di browser ini saja), atau set <code className="font-mono text-xs">AI_ROUTER_API_KEY</code> di env Vercel.
+            </span>
+            <button
+              onClick={() => setTab("settings")}
+              className="rounded-full bg-ink text-bg px-4 py-2 text-xs font-bold uppercase tracking-widest hover:-translate-y-0.5 transition shadow-soft"
+            >
+              Hubungkan router
+            </button>
           </div>
         ) : null}
         <div key={tab} className="animate-fadeUp">
